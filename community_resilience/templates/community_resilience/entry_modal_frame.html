@@ -1,0 +1,20 @@
+{% load static %}
+<!doctype html>
+<html lang="en" class="entry-frame-document">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }} · Bayanihan Ready</title>
+    <link rel="stylesheet" href="{% static 'community_resilience/style.css' %}?v=20261019i">
+    {% if form.latitude %}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.css">
+    <script type="importmap">{"imports":{"leaflet":"https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js","maplibre-gl":"https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.mjs"}}</script>
+    {% endif %}
+</head>
+<body class="entry-frame-page">
+    {% include 'community_resilience/entry_modal_form.html' %}
+    {% if form.latitude %}<script type="module" src="{% static 'community_resilience/map.js' %}?v=20261019d"></script>{% endif %}
+    <script src="{% static 'community_resilience/entry_modal_frame.js' %}?v=20261019d"></script>
+</body>
+</html>

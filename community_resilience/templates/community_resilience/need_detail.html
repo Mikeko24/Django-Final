@@ -1,0 +1,90 @@
+{% extends 'community_resilience/base.html' %}
+{% load static %}
+{% block title %}{{ need.get_need_type_display }} in {{ need.barangay }} · Bayanihan Ready{% endblock %}
+{% block content %}
+<div class="detail-back"><a href="{% url 'need-list' %}" class="action-link">{% include "community_resilience/icon.html" with name="back" only %}<span>Back to community needs</span></a></div>
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">COMMUNITY NEED · {{ need.created_at|date:'M j, Y' }}</p>
+        <h1>{{ need.get_need_type_display }}</h1>
+        <p class="muted">{{ need.barangay }} · {{ need.household_size }} people</p>
+    </div>
+    <div class="detail-actions">
+        <span class="badge {{ need.priority }}">{{ need.get_priority_display }} priority</span>
+        <span class="badge {{ need.status }}">{{ need.get_status_display }}</span>
+        {% if user.role == 'volunteer' and need.status != 'fulfilled' %}
+            {% if pending_completion_submission %}
+                <span class="badge in_progress">Completion awaiting review</span>
+            {% else %}
+                <a class="button secondary" href="{% url 'need-completion-submit' need.pk %}">{% include "community_resilience/icon.html" with name="camera" only %}<span>Submit completion photo</span></a>
+            {% endif %}
+        {% endif %}
+        {% if user.can_manage_community %}
+            <a class="button secondary" href="{% url 'need-update' need.pk %}" data-entry-modal>{% include "community_resilience/icon.html" with name="edit" only %}<span>Update need</span></a>
+            <a class="button danger" href="{% url 'need-delete' need.pk %}">{% include "community_resilience/icon.html" with name="delete" only %}<span>Delete</span></a>
+        {% endif %}
+    </div>
+</section>
+<div class="need-detail-grid">
+    <section class="panel need-information">
+        <p class="eyebrow">REQUEST DETAILS</p>
+        <h2>What support is needed?</h2>
+        <p class="need-description">{{ need.description|linebreaksbr }}</p>
+        <dl class="detail-facts">
+            <div><dt>Need type</dt><dd>{{ need.get_need_type_display }}</dd></div>
+            <div><dt>Barangay</dt><dd>{{ need.barangay }}</dd></div>
+            <div><dt>People in household</dt><dd>{{ need.household_size }}</dd></div>
+            <div><dt>Priority</dt><dd>{{ need.get_priority_display }}</dd></div>
+            <div><dt>Assistance status</dt><dd>{{ need.get_status_display }}</dd></div>
+            <div><dt>Reported</dt><dd>{{ need.created_at|date:'F j, Y · g:i A' }}</dd></div>
+            <div><dt>Last updated</dt><dd>{{ need.updated_at|date:'F j, Y · g:i A' }}</dd></div>
+            {% if need.has_coordinates %}
+                <div><dt>Map pin</dt><dd>{{ need.latitude|floatformat:6 }}, {{ need.longitude|floatformat:6 }}</dd></div>
+            {% else %}
+                <div><dt>Map pin</dt><dd>No location pin added</dd></div>
+            {% endif %}
+        </dl>
+    </section>
+    <section class="panel need-location-panel">
+        <div>
+            <p class="eyebrow">SUPPORT LOCATION</p>
+            <h2>Map location</h2>
+            {% if need.has_coordinates %}
+                <p class="muted">The selected public support location for this need in {{ need.barangay }}.</p>
+                <div
+                    class="need-detail-map"
+                    id="need-detail-map"
+                    data-latitude="{{ need.latitude }}"
+                    data-longitude="{{ need.longitude }}"
+                    data-title="{{ need.get_need_type_display }} · {{ need.barangay }}"
+                    role="region"
+                    aria-label="Map showing the selected support location">
+                </div>
+                <a class="map-open-link" href="https://www.google.com/maps/search/?api=1&amp;query={{ need.latitude }},{{ need.longitude }}" target="_blank" rel="noopener noreferrer">Open this pin in Google Maps ↗</a>
+            {% else %}
+                <p class="muted">No pin was selected for this report.</p>
+                {% if user.can_manage_community %}<a class="button secondary" href="{% url 'need-update' need.pk %}" data-entry-modal>{% include "community_resilience/icon.html" with name="pin" only %}<span>Add a map pin</span></a>{% endif %}
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+{% block extra_head %}
+{% if need.has_coordinates or user.can_manage_community %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.css">
+<script type="importmap">
+{
+    "imports": {
+        "leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js",
+        "maplibre-gl": "https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.mjs"
+    }
+}
+</script>
+{% endif %}
+{% endblock %}
+{% block extra_scripts %}
+{% if need.has_coordinates %}
+<script type="module" src="{% static 'community_resilience/map.js' %}"></script>
+{% endif %}
+{% endblock %}

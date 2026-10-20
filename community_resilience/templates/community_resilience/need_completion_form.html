@@ -1,0 +1,32 @@
+{% extends 'community_resilience/base.html' %}
+{% block title %}Submit completion · Bayanihan Ready{% endblock %}
+{% block content %}
+<div class="detail-back"><a href="{% url 'need-detail' need.pk %}" class="action-link">{% include "community_resilience/icon.html" with name="back" only %}<span>Back to need details</span></a></div>
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">VOLUNTEER UPDATE</p>
+        <h1>Submit completion for review</h1>
+        <p class="muted">{{ need.get_need_type_display }} · {{ need.barangay }}</p>
+    </div>
+</section>
+<section class="panel form-panel">
+    <p class="need-description">Upload a photo showing how this need was addressed. A system administrator will review the evidence before the need is marked done.</p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+        {% for field in form %}
+            <div class="field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                {% for error in field.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+        {% endfor %}
+        <p class="privacy-note">Only authorized system administrators can view the uploaded photo. Avoid including faces or personal documents unless needed to verify the support.</p>
+        <div class="form-actions">
+            <button class="button" type="submit">{% include "community_resilience/icon.html" with name="send" only %}<span>Send for admin review</span></button>
+            <a class="button secondary" href="{% url 'need-detail' need.pk %}">{% include "community_resilience/icon.html" with name="close" only %}<span>Cancel</span></a>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'community_resilience/base.html' %}
+{% block title %}{{ title }} · Bayanihan Ready{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow">PLEASE CONFIRM</p><h1>{{ title }}</h1></div></section>
+<section class="panel form-panel">
+    <p>Are you sure you want to delete <strong>{{ object }}</strong>? This action cannot be undone.</p>
+    <form method="post">{% csrf_token %}<div class="form-actions"><button class="button danger" type="submit">{% include "community_resilience/icon.html" with name="delete" only %}<span>Delete</span></button><a class="button secondary" href="javascript:history.back()">{% include "community_resilience/icon.html" with name="close" only %}<span>Cancel</span></a></div></form>
+</section>
+{% endblock %}

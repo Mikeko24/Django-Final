@@ -1,0 +1,71 @@
+<div class="entry-dialog-shell">
+    <header class="entry-dialog-heading">
+        <div>
+            <p class="eyebrow">{{ modal_eyebrow|default:'QUICK ENTRY' }}</p>
+            <h2 id="entry-dialog-title" data-entry-title tabindex="-1">{{ title }}</h2>
+            <p class="muted">{{ modal_description|default:'Complete the details below. You can close this window without leaving your current page.' }}</p>
+        </div>
+        <button class="activity-dialog-close" type="button" aria-label="Close {{ title|lower }}" data-close-entry>{% include "community_resilience/icon.html" with name="close" only %}</button>
+    </header>
+    <form method="post" action="{{ request.get_full_path }}" data-entry-form data-need-update-form>
+        {% csrf_token %}
+        <div class="entry-form-body">
+            {% if submission %}
+                <section class="entry-review-summary entry-form-wide" aria-labelledby="entry-review-summary-title">
+                    <div>
+                        <p class="eyebrow">SUBMISSION</p>
+                        <h3 id="entry-review-summary-title">{{ submission.need }}</h3>
+                        <p>Submitted by {{ submission.submitted_by }} · {{ submission.submitted_at|date:'M j, Y · g:i A' }}</p>
+                        <p>{{ submission.need.description }}</p>
+                        <a href="{% url 'need-detail' submission.need_id %}" class="action-link" target="_blank" rel="noopener noreferrer">{% include "community_resilience/icon.html" with name="eye" only %}<span>View community need</span></a>
+                    </div>
+                    <a class="entry-review-proof-link" href="{% url 'need-completion-proof' submission.pk %}" target="_blank" rel="noopener noreferrer">
+                        <img class="admin-proof entry-review-proof" src="{% url 'need-completion-proof' submission.pk %}" alt="Completion evidence submitted by {{ submission.submitted_by }}">
+                    </a>
+                </section>
+            {% endif %}
+            {% if form.non_field_errors %}<div class="form-errors entry-form-wide" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+            <div class="entry-form-grid">
+                {% for field in form %}
+                    {% if field.name != 'latitude' and field.name != 'longitude' %}
+                    <div class="field field-{{ field.name }}{% if field.field.widget.input_type == 'checkbox' %} admin-checkbox{% endif %}">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span aria-hidden="true">*</span>{% endif %}</label>
+                        {{ field }}
+                        {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                        {% for error in field.errors %}<span class="error" role="alert">{{ error }}</span>{% endfor %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% if form.latitude %}
+                {{ form.latitude }}
+                {{ form.longitude }}
+                <section class="location-picker entry-form-wide" aria-labelledby="entry-location-heading">
+                    <div class="location-picker-heading">
+                        <div>
+                            <h3 id="entry-location-heading">Pin a location</h3>
+                            {% if form.barangay %}
+                                <p>Select a public/community support point, not a household’s exact home.</p>
+                            {% else %}
+                                <p>Select the task or supply location. This is optional.</p>
+                            {% endif %}
+                        </div>
+                        <button class="button secondary clear-location" id="clear-map-location" type="button">{% include "community_resilience/icon.html" with name="close" only %}<span>Clear pin</span></button>
+                    </div>
+                    <div class="location-map" id="location-picker-map" role="region" aria-label="Select a location on the map"></div>
+                    <p class="map-selection-status" id="map-selection-status" aria-live="polite">Click the map to add a location pin.</p>
+                    {% for error in form.latitude.errors %}<span class="error">{{ error }}</span>{% endfor %}
+                    {% for error in form.longitude.errors %}<span class="error">{{ error }}</span>{% endfor %}
+                </section>
+            {% endif %}
+            <div class="form-errors entry-request-error" data-entry-request-error role="alert" hidden></div>
+        </div>
+        <footer class="entry-dialog-actions">
+            <span class="entry-dialog-hint">Press Esc to close</span>
+            <div class="form-actions">
+                <button class="button" type="submit" data-entry-submit>{% include "community_resilience/icon.html" with name="save" only %}<span>{{ submit_label|default:'Save changes' }}</span></button>
+                <button class="button secondary" type="button" data-close-entry>{% include "community_resilience/icon.html" with name="close" only %}<span>Cancel</span></button>
+            </div>
+        </footer>
+    </form>
+</div>

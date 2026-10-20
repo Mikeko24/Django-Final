@@ -1,0 +1,86 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Community Resilience{% endblock %}</title>
+    <meta name="theme-color" content="#153e32">
+    <link rel="icon" type="image/svg+xml" href="{% static 'community_resilience/mark.svg' %}">
+    <link rel="stylesheet" href="{% static 'community_resilience/style.css' %}?v=20261019i">
+    {% block extra_head %}{% endblock %}
+</head>
+<body{% if user.is_authenticated %} data-role="{% if user.is_superuser %}super-admin{% else %}{{ user.role }}{% endif %}"{% endif %}>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    {% if user.is_authenticated %}
+    <div class="app-layout">
+        <div class="main-column">
+            <header class="topbar">
+                <a class="brand" href="{% url 'dashboard' %}">
+                <img src="{% static 'community_resilience/mark.svg' %}" alt="">
+                    <span>Bayanihan <span class="brand-light">Ready</span></span>
+                </a>
+                <nav aria-label="Main navigation">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}" aria-label="Dashboard" title="Dashboard"{% if request.resolver_match.url_name == 'dashboard' %} aria-current="page"{% endif %}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="11" width="7" height="10" rx="2"/><rect x="3" y="14" width="8" height="7" rx="2"/></svg>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                    <a class="nav-link {% if 'task-' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'task-list' %}" aria-label="Tasks" title="Tasks"{% if 'task-' in request.resolver_match.url_name %} aria-current="page"{% endif %}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h12M8 12h12M8 19h12"/><path d="m3.5 5 1.5 1.5L7 4.5m-3.5 7 1.5 1.5 2-2m-3.5 7 1.5 1.5 2-2"/></svg>
+                        <span class="nav-text">Tasks</span>
+                    </a>
+                    <a class="nav-link {% if 'resource-' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'resource-list' %}" aria-label="Resources" title="Resources"{% if 'resource-' in request.resolver_match.url_name %} aria-current="page"{% endif %}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5z"/><path d="m4.5 7.8 7.5 4.4 7.5-4.4M12 12.3V21m-4-9.5v3"/></svg>
+                        <span class="nav-text">Resources</span>
+                    </a>
+                    <a class="nav-link {% if 'need-' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'need-list' %}" aria-label="Community needs" title="Community needs"{% if 'need-' in request.resolver_match.url_name %} aria-current="page"{% endif %}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2s-8-4.5-8-10.1a4.5 4.5 0 0 1 8-2.8 4.5 4.5 0 0 1 8 2.8c0 5.6-8 10.1-8 10.1Z"/><path d="M8 12h2.4l1.3-2.3 2.1 4.6 1.2-2.3H18"/></svg>
+                        <span class="nav-text">Community needs</span>
+                    </a>
+                    {% if user.is_superuser %}
+                    <a class="nav-link {% if 'admin-' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'admin-dashboard' %}" title="Administration" aria-label="Administration"{% if 'admin-' in request.resolver_match.url_name %} aria-current="page"{% endif %}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6z"/><path d="m8 12 3 3 5-6"/></svg>
+                        <span class="nav-text">Admin</span>
+                    </a>
+                    {% endif %}
+                </nav>
+                <div class="account">
+                    <div class="avatar" aria-hidden="true">{{ user.first_name|default:user.username|first|upper }}</div>
+                    <div class="account-copy"><strong>{{ user.get_full_name|default:user.username }}</strong><span class="role-chip">{% if user.is_superuser %}Super admin{% else %}{{ user.get_role_display }}{% endif %}</span></div>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button class="logout-button" type="submit" aria-label="Log out" title="Log out">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5m5 5H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg>
+                        </button>
+                    </form>
+                </div>
+            </header>
+    {% else %}
+    <div class="public-layout">
+        <a class="public-brand" href="{% url 'login' %}">
+            <img src="{% static 'community_resilience/mark.svg' %}" alt="">
+            <span>Bayanihan <span class="brand-light">Ready</span></span>
+        </a>
+    {% endif %}
+    <main id="main-content" class="{% if user.is_authenticated %}page{% else %}public-main{% endif %}" tabindex="-1">
+    {% if messages %}
+        {% for message in messages %}<div class="notice" role="status"><span>{{ message }}</span><button type="button" class="notice-dismiss" aria-label="Dismiss notification">&times;</button></div>{% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+    </main>
+    {% block extra_scripts %}{% endblock %}
+    <script src="{% static 'community_resilience/ui.js' %}?v=20261019" defer></script>
+    {% if user.is_authenticated %}
+        <dialog class="entry-dialog" id="entry-dialog" aria-labelledby="entry-dialog-title">
+            <div id="entry-dialog-content"></div>
+        </dialog>
+        <script type="module" src="{% static 'community_resilience/entry_modal.js' %}?v=20261019d"></script>
+        <footer><span class="footer-brand">Bayanihan Ready</span><span>Prepared with care. Stronger together.</span></footer>
+        </div>
+    </div>
+    {% else %}
+        <footer><span class="footer-brand">Bayanihan Ready</span><span>Prepared with care. Stronger together.</span></footer>
+    </div>
+    {% endif %}
+</body>
+</html>

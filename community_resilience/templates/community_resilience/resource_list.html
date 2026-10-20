@@ -1,0 +1,21 @@
+{% extends 'community_resilience/base.html' %}
+{% block title %}Resource inventory · Bayanihan Ready{% endblock %}
+{% block content %}
+<section class="page-heading">
+    <div><p class="eyebrow">SUPPLY COORDINATION</p><h1>Resource inventory</h1><p class="muted">Keep a shared view of emergency supplies and where they are stored.</p></div>
+    {% if user.can_manage_community %}<a class="button" href="{% url 'resource-create' %}" data-entry-modal>{% include "community_resilience/icon.html" with name="plus" only %}<span>Add resource</span></a>{% endif %}
+</section>
+<section class="panel table-wrap">
+    <table><thead><tr><th>Resource</th><th>Category</th><th>Quantity</th><th>Storage location</th><th>Last updated</th>{% if user.can_manage_community %}<th>Actions</th>{% endif %}</tr></thead>
+    <tbody>{% for resource in resources %}
+        <tr><td><strong>{{ resource.name }}</strong></td><td>{{ resource.get_category_display }}</td><td>{{ resource.quantity }} {{ resource.unit }}</td><td>{{ resource.location }}</td><td>{{ resource.updated_at|date:'M j, Y' }}</td>
+            {% if user.can_manage_community %}<td class="actions"><a href="{% url 'resource-update' resource.pk %}" class="action-link" data-entry-modal aria-label="Edit {{ resource.name }}" title="Edit resource">{% include "community_resilience/icon.html" with name="edit" only %}</a><a href="{% url 'resource-delete' resource.pk %}" class="action-link danger-action" aria-label="Remove {{ resource.name }}" title="Remove resource">{% include "community_resilience/icon.html" with name="delete" only %}</a></td>{% endif %}
+        </tr>
+    {% empty %}<tr><td colspan="{% if user.can_manage_community %}6{% else %}5{% endif %}" class="empty">No resources recorded yet.</td></tr>{% endfor %}</tbody></table>
+</section>
+{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.css">
+<script type="importmap">{"imports":{"leaflet":"https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js","maplibre-gl":"https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.mjs"}}</script>
+{% endblock %}

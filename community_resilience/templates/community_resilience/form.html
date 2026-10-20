@@ -1,0 +1,63 @@
+{% extends 'community_resilience/base.html' %}
+{% load static %}
+{% block title %}{{ title }} · Bayanihan Ready{% endblock %}
+{% block content %}
+<section class="page-heading"><div><p class="eyebrow">COMMUNITY RESILIENCE</p><h1>{{ title }}</h1></div></section>
+<section class="panel form-panel">
+    <form method="post">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+        {% for field in form %}
+            {% if field.name != 'latitude' and field.name != 'longitude' %}
+            <div class="field">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}
+                {% for error in field.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </div>
+            {% endif %}
+        {% endfor %}
+        {% if form.latitude %}
+            {{ form.latitude }}
+            {{ form.longitude }}
+            <section class="location-picker" aria-labelledby="location-picker-heading">
+                <div class="location-picker-heading">
+                    <div>
+                        <h2 id="location-picker-heading">Pin a location</h2>
+                        {% if form.barangay %}
+                            <p>Select a public/community support point, not a household’s exact home.</p>
+                        {% else %}
+                            <p>Select the task or supply location. This is optional.</p>
+                        {% endif %}
+                    </div>
+                    <button class="button secondary clear-location" id="clear-map-location" type="button">{% include "community_resilience/icon.html" with name="close" only %}<span>Clear pin</span></button>
+                </div>
+                <div class="location-map" id="location-picker-map" role="region" aria-label="Select a location on the map"></div>
+                <p class="map-selection-status" id="map-selection-status" aria-live="polite">Click the map to add a location pin.</p>
+                {% for error in form.latitude.errors %}<span class="error">{{ error }}</span>{% endfor %}
+                {% for error in form.longitude.errors %}<span class="error">{{ error }}</span>{% endfor %}
+            </section>
+        {% endif %}
+        <div class="form-actions"><button class="button" type="submit">{% include "community_resilience/icon.html" with name="save" only %}<span>Save</span></button><a class="button secondary" href="javascript:history.back()">{% include "community_resilience/icon.html" with name="close" only %}<span>Cancel</span></a></div>
+    </form>
+</section>
+{% endblock %}
+{% block extra_head %}
+{% if form.latitude %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.css">
+<script type="importmap">
+{
+    "imports": {
+        "leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js",
+        "maplibre-gl": "https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.mjs"
+    }
+}
+</script>
+{% endif %}
+{% endblock %}
+{% block extra_scripts %}
+{% if form.latitude %}
+<script type="module" src="{% static 'community_resilience/map.js' %}"></script>
+{% endif %}
+{% endblock %}

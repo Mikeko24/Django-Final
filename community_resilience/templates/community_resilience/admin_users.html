@@ -1,0 +1,11 @@
+{% extends 'community_resilience/base.html' %}
+{% block title %}Community accounts · Bayanihan Ready{% endblock %}
+{% block content %}
+<a href="{% url 'admin-dashboard' %}" class="action-link">{% include "community_resilience/icon.html" with name="back" only %}<span>Administration</span></a>
+<section class="page-heading"><div><p class="eyebrow">PEOPLE & ACCESS</p><h1>Community accounts</h1></div><a class="button" href="{% url 'admin-user-create' %}" data-entry-modal>{% include "community_resilience/icon.html" with name="plus" only %}<span>Create account</span></a></section>
+<form method="get" class="admin-search"><div class="field"><label for="account-search">Search by name, username, or email</label><input id="account-search" name="q" value="{{ request.GET.q }}" type="search"></div><button class="button" type="submit">{% include "community_resilience/icon.html" with name="search" only %}<span>Search</span></button></form>
+<section class="panel table-wrap"><table><thead><tr><th scope="col">Account</th><th scope="col">Community role</th><th scope="col">Access</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead><tbody>
+{% for account in accounts %}<tr><td><strong>{{ account.username }}</strong><br>{{ account.get_full_name }}<br>{{ account.email }}</td><td>{{ account.get_role_display }}</td><td>{% if account.is_superuser %}Super admin{% elif account.is_staff %}Maintenance staff{% else %}Community member{% endif %}</td><td>{% if account.is_active %}Active{% else %}Inactive{% endif %}</td><td><a href="{% url 'admin-user-update' account.pk %}" aria-label="Edit {{ account.username }}" class="action-link" data-entry-modal>{% include "community_resilience/icon.html" with name="edit" only %}<span>Edit access</span></a></td></tr>{% empty %}<tr><td colspan="5" class="empty">No accounts match your search.</td></tr>{% endfor %}
+</tbody></table></section>
+{% include 'community_resilience/admin_pagination.html' %}
+{% endblock %}

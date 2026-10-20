@@ -1,0 +1,95 @@
+{% extends 'community_resilience/base.html' %}
+{% load static %}
+{% block title %}Dashboard · Bayanihan Ready{% endblock %}
+{% block content %}
+<section class="welcome-banner">
+    <div>
+        <p class="eyebrow">YOUR COMMUNITY · YOUR IMPACT</p>
+        <h1>Good day, {{ user.first_name|default:user.username }}.</h1>
+        <p>Small acts of preparation make a lasting difference. Here’s what’s happening in your community.</p>
+        {% if user.can_manage_community %}
+        <a class="button banner-button" href="{% url 'task-create' %}" data-entry-modal>{% include "community_resilience/icon.html" with name="plus" only %}<span>Organize a task</span></a>
+        {% else %}
+        <a class="button banner-button" href="{% url 'need-create' %}" data-entry-modal>{% include "community_resilience/icon.html" with name="plus" only %}<span>Ask for support</span></a>
+        {% endif %}
+    </div>
+    <figure class="banner-photo">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Preparation_for_Relief_Giving_Operation.jpg/1280px-Preparation_for_Relief_Giving_Operation.jpg" alt="Filipino community volunteers preparing food for people affected by severe flooding" fetchpriority="high" referrerpolicy="no-referrer">
+        <figcaption>Community volunteers preparing relief food · <a href="https://commons.wikimedia.org/wiki/File:Preparation_for_Relief_Giving_Operation.jpg" target="_blank" rel="noopener noreferrer">kunokuno / Wikimedia Commons, CC BY-SA 4.0</a></figcaption>
+    </figure>
+</section>
+<section class="stats" aria-label="Preparedness summary">
+    <article class="stat-card"><div class="stat-icon tasks-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5h12M8 12h12M8 19h12"/><path d="m3.5 5 1.5 1.5L7 4.5m-3.5 7 1.5 1.5 2-2m-3.5 7 1.5 1.5 2-2"/></svg></div><div class="stat-copy"><span>Open tasks</span><strong>{{ open_task_count }}</strong></div><a href="{% url 'task-list' %}" aria-label="View tasks" class="action-link">{% include "community_resilience/icon.html" with name="external" only %}</a></article>
+    <article class="stat-card"><div class="stat-icon resource-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5z"/><path d="m4.5 7.8 7.5 4.4 7.5-4.4M12 12.3V21"/></svg></div><div class="stat-copy"><span>Tracked resources</span><strong>{{ resource_count }}</strong></div><a href="{% url 'resource-list' %}" aria-label="View resources" class="action-link">{% include "community_resilience/icon.html" with name="external" only %}</a></article>
+    <article class="stat-card"><div class="stat-icon needs-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.2s-8-4.5-8-10.1a4.5 4.5 0 0 1 8-2.8 4.5 4.5 0 0 1 8 2.8c0 5.6-8 10.1-8 10.1Z"/></svg></div><div class="stat-copy"><span>Unresolved needs</span><strong>{{ open_need_count }}</strong></div><a href="{% url 'need-list' %}" aria-label="View community needs" class="action-link">{% include "community_resilience/icon.html" with name="external" only %}</a></article>
+</section>
+<section class="map-panel">
+    <div class="map-heading">
+        <div>
+            <p class="eyebrow">A SHARED VIEW OF READINESS</p>
+            <h2>Community activity map</h2>
+            <p class="muted">Select a map pin to see who posted it and review the activity details.</p>
+        </div>
+        <span class="map-record-count" id="map-record-count">Loading locations…</span>
+    </div>
+    <div class="map-legend" aria-label="Map marker categories">
+        <span><i class="legend-dot task-dot"></i>Tasks</span>
+        <span><i class="legend-dot resource-dot"></i>Resources</span>
+        <span><i class="legend-dot need-dot"></i>Community needs</span>
+    </div>
+    <div class="community-map" id="community-map" role="region" aria-label="Map of community tasks, resources, and needs"></div>
+    <p class="map-attribution-note">Map style © OpenFreeMap and OpenMapTiles. Data © OpenStreetMap contributors. Only entries with a selected map location appear here.</p>
+    <dialog class="activity-dialog" id="activity-dialog" aria-labelledby="activity-dialog-title">
+        <div class="activity-dialog-heading">
+            <div>
+                <p class="eyebrow" id="activity-dialog-kind"></p>
+                <h2 id="activity-dialog-title"></h2>
+            </div>
+            <button class="activity-dialog-close" type="button" aria-label="Close activity details" data-close-activity-dialog>{% include "community_resilience/icon.html" with name="close" only %}</button>
+        </div>
+        <dl class="activity-dialog-details" id="activity-dialog-details"></dl>
+        <a class="button activity-dialog-map-link" id="activity-dialog-map-link" href="#" target="_blank" rel="noopener noreferrer">
+            {% include "community_resilience/icon.html" with name="external" only %}
+            <span>Open in Google Maps</span>
+        </a>
+    </dialog>
+    {{ map_markers|json_script:"community-map-markers" }}
+</section>
+<div class="columns">
+    <section class="panel">
+        <div class="section-heading"><div><p class="eyebrow">GET THINGS MOVING</p><h2>Tasks to follow up</h2></div><a href="{% url 'task-list' %}">All tasks <span aria-hidden="true">↗</span></a></div>
+        {% if recent_tasks %}
+        <ul class="item-list">
+            {% for task in recent_tasks %}
+            <li><div><strong>{{ task.title }}</strong><span>{{ task.get_category_display }}{% if task.due_date %} · Due {{ task.due_date }}{% endif %}</span></div><span class="badge {{ task.status }}">{{ task.get_status_display }}</span></li>
+            {% endfor %}
+        </ul>
+        {% else %}<p class="empty">No tasks are assigned or available yet.</p>{% endif %}
+    </section>
+    <section class="panel needs-panel">
+        <div class="section-heading"><div><p class="eyebrow">LOOK OUT FOR ONE ANOTHER</p><h2>Community needs</h2></div><a href="{% url 'need-list' %}">All needs <span aria-hidden="true">↗</span></a></div>
+        {% if urgent_needs %}
+        <ul class="item-list">
+            {% for need in urgent_needs %}
+            <li><div><strong>{{ need.get_need_type_display }} · {{ need.barangay }}</strong><span>{{ need.household_size }} people · {{ need.get_priority_display }}</span></div><span class="badge {{ need.status }}">{{ need.get_status_display }}</span></li>
+            {% endfor %}
+        </ul>
+        {% else %}<p class="empty">No unresolved urgent needs recorded.</p>{% endif %}
+    </section>
+</div>
+{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.css">
+<script type="importmap">
+{
+    "imports": {
+        "leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js",
+        "maplibre-gl": "https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.mjs"
+    }
+}
+</script>
+{% endblock %}
+{% block extra_scripts %}
+<script type="module" src="{% static 'community_resilience/map.js' %}"></script>
+{% endblock %}

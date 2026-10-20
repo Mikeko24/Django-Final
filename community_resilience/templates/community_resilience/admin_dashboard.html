@@ -1,0 +1,15 @@
+{% extends 'community_resilience/base.html' %}
+{% block title %}Administration · Bayanihan Ready{% endblock %}
+{% block content %}
+<section class="welcome-banner"><div><p class="eyebrow">SUPER ADMIN</p><h1>Care for your community.</h1><p>Manage accounts, review delivered support, and keep community information up to date.</p><a class="button banner-button" href="{% url 'admin-reviews' %}">{% include "community_resilience/icon.html" with name="eye" only %}<span>Review completion photos</span></a></div></section>
+<section class="stats" aria-label="Administration summary">
+<article class="stat-card"><div class="stat-copy"><span>Community accounts</span><strong>{{ user_count }}</strong></div><a href="{% url 'admin-users' %}" aria-label="Manage accounts" class="action-link">{% include "community_resilience/icon.html" with name="external" only %}</a></article>
+<article class="stat-card"><div class="stat-copy"><span>Awaiting review</span><strong>{{ pending_count }}</strong></div><a href="{% url 'admin-reviews' %}" aria-label="Review submissions" class="action-link">{% include "community_resilience/icon.html" with name="external" only %}</a></article>
+<article class="stat-card"><div class="stat-copy"><span>Inactive accounts</span><strong>{{ inactive_count }}</strong></div></article>
+</section>
+<div class="admin-grid">
+<section class="panel"><p class="eyebrow">PEOPLE & ACCESS</p><h2>Community accounts</h2><p>Create accounts, assign community roles, and manage active status and super admin access.</p><a class="button" href="{% url 'admin-users' %}">{% include "community_resilience/icon.html" with name="users" only %}<span>Manage users</span></a></section>
+<section class="panel"><p class="eyebrow">DELIVERED SUPPORT</p><h2>Completion reviews</h2><p>Check volunteer photos, approve completed needs, or request corrections with review notes.</p><a class="button" href="{% url 'admin-reviews' %}">{% include "community_resilience/icon.html" with name="check" only %}<span>Open review queue</span></a></section>
+<section class="panel"><p class="eyebrow">COMMUNITY OPERATIONS</p><h2>Manage community records</h2><p>Your super admin account can manage all tasks, resources, and reported needs.</p><div class="form-actions"><a class="button secondary" href="{% url 'task-list' %}">{% include "community_resilience/icon.html" with name="check" only %}<span>Tasks</span></a><a class="button secondary" href="{% url 'resource-list' %}">{% include "community_resilience/icon.html" with name="box" only %}<span>Resources</span></a><a class="button secondary" href="{% url 'need-list' %}">{% include "community_resilience/icon.html" with name="heart" only %}<span>Needs</span></a></div></section>
+</div>
+{% endblock %}

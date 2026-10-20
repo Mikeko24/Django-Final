@@ -1,0 +1,31 @@
+{% extends 'community_resilience/base.html' %}
+{% load static %}
+{% block title %}Community needs · Bayanihan Ready{% endblock %}
+{% block content %}
+<section class="page-heading">
+    <div><p class="eyebrow">MUTUAL AID</p><h1>Community needs</h1><p class="muted">Record household requests and follow each one through to support.</p></div>
+    <a class="button" href="{% url 'need-create' %}" data-entry-modal>{% include "community_resilience/icon.html" with name="plus" only %}<span>Report a need</span></a>
+</section>
+<section class="panel table-wrap">
+    <table><thead><tr><th>Need</th><th>Barangay</th><th>People</th><th>Priority</th><th>Status</th><th>Reported</th>{% if user.can_manage_community %}<th>Actions</th>{% endif %}</tr></thead>
+    <tbody>{% for need in needs %}
+        <tr><td><a class="need-detail-link" href="{% url 'need-detail' need.pk %}"><strong>{{ need.get_need_type_display }}</strong><small>{{ need.description|truncatechars:90 }}</small></a></td><td>{{ need.barangay }}</td><td>{{ need.household_size }}</td><td><span class="badge {{ need.priority }}">{{ need.get_priority_display }}</span></td><td><span class="badge {{ need.status }}">{{ need.get_status_display }}</span></td><td>{{ need.created_at|date:'M j, Y' }}</td>
+            {% if user.can_manage_community %}<td class="actions"><a href="{% url 'need-update' need.pk %}" class="action-link" data-entry-modal aria-label="Update {{ need.get_need_type_display }} need" title="Update need">{% include "community_resilience/icon.html" with name="edit" only %}</a><a href="{% url 'need-delete' need.pk %}" class="action-link danger-action" aria-label="Delete {{ need.get_need_type_display }} need" title="Delete need">{% include "community_resilience/icon.html" with name="delete" only %}</a></td>{% endif %}
+        </tr>
+    {% empty %}<tr><td colspan="{% if user.can_manage_community %}7{% else %}6{% endif %}" class="empty">No community needs recorded yet.</td></tr>{% endfor %}</tbody></table>
+</section>
+{% endblock %}
+{% block extra_head %}
+{% if user.can_manage_community %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.css">
+<script type="importmap">
+{
+    "imports": {
+        "leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js",
+        "maplibre-gl": "https://unpkg.com/maplibre-gl@6.3.0/dist/maplibre-gl.mjs"
+    }
+}
+</script>
+{% endif %}
+{% endblock %}

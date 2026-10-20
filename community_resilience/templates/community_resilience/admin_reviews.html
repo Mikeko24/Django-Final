@@ -1,0 +1,7 @@
+{% extends 'community_resilience/base.html' %}
+{% block title %}Completion reviews · Bayanihan Ready{% endblock %}
+{% block content %}<a href="{% url 'admin-dashboard' %}" class="action-link">{% include "community_resilience/icon.html" with name="back" only %}<span>Administration</span></a>
+<section class="page-heading"><div><p class="eyebrow">DELIVERED SUPPORT</p><h1>Completion reviews</h1><p>Review the oldest submissions first. Approving a photo marks the community need done.</p></div></section>
+<section class="panel table-wrap"><table><thead><tr><th scope="col">Community need</th><th scope="col">Volunteer</th><th scope="col">Submitted</th><th scope="col">Action</th></tr></thead><tbody>
+{% for submission in submissions %}<tr><td>{{ submission.need }}</td><td>{{ submission.submitted_by }}</td><td>{{ submission.submitted_at|date:'M j, Y H:i' }}</td><td><a href="{% url 'admin-review' submission.pk %}" class="action-link" data-entry-modal>{% include "community_resilience/icon.html" with name="eye" only %}<span>Review photo</span></a></td></tr>{% empty %}<tr><td colspan="4" class="empty">All caught up. No completion photos are awaiting review.</td></tr>{% endfor %}
+</tbody></table></section>{% include 'community_resilience/admin_pagination.html' %}{% endblock %}

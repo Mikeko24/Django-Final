@@ -1,0 +1,33 @@
+{% extends 'community_resilience/base.html' %}
+{% block title %}Sign in · Bayanihan Ready{% endblock %}
+{% block content %}
+<section class="auth-layout">
+    <div class="login-story">
+        <p class="story-eyebrow">ALWAYS READY. ALWAYS TOGETHER.</p>
+        <h1>Preparedness starts with people.</h1>
+        <p>Bring neighbors, local leaders, and volunteers together to build a safer, more resilient barangay.</p>
+        <div class="login-landscape" aria-hidden="true">
+            <span class="login-sun"></span>
+            <svg viewBox="0 0 450 190">
+                <path d="M0 115c65-48 116-39 179-4 54 30 92 25 142-10 48-34 89-34 129-7v96H0z" fill="#71916d"/>
+                <path d="M0 145c68-31 111-21 169 9 52 27 99 21 151-12 49-30 91-20 130 1v47H0z" fill="#456f56"/>
+                <path d="M35 167c49-14 77-8 116 10m-50-31c39 0 62 9 90 26m30-8c45-25 73-31 118-20m-55-21c34-17 62-19 96-9" fill="none" stroke="#d5e786" stroke-width="2" opacity=".8"/>
+                <path d="M110 83c12-14 23-14 35 0m111-30c9-11 18-11 27 0" fill="none" stroke="#e8efce" stroke-linecap="round" stroke-width="3"/>
+            </svg>
+        </div>
+        <span class="story-caption">A LITTLE PREPARATION GOES A LONG WAY.</span>
+    </div>
+    <div class="login-card">
+        <p class="eyebrow">COMMUNITY PREPAREDNESS</p>
+        <h2>Welcome back</h2>
+        <p class="muted">Sign in to coordinate local preparedness and mutual aid.</p>
+        {% if form.errors %}<div class="form-errors" role="alert">Your username or password was not recognized. Check both fields and try again.</div>{% endif %}
+        <form method="post">{% csrf_token %}
+            {% for field in form %}<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}</div>{% endfor %}
+            <input type="hidden" name="next" value="{{ next }}">
+            <button class="button full-width" type="submit">{% include "community_resilience/icon.html" with name="login" only %}<span>Sign in</span></button>
+        </form>
+        <p class="login-help">Working together makes every community stronger.</p>
+    </div>
+</section>
+{% endblock %}

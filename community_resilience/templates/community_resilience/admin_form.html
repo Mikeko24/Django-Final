@@ -1,0 +1,10 @@
+{% extends 'community_resilience/base.html' %}
+{% block title %}{{ title }} · Bayanihan Ready{% endblock %}
+{% block content %}<a href="{{ cancel_url }}" class="action-link">{% include "community_resilience/icon.html" with name="back" only %}<span>Back to {% if submission %}review queue{% else %}accounts{% endif %}</span></a>
+<section class="page-heading"><div><p class="eyebrow">SUPER ADMIN</p><h1>{{ title }}</h1></div></section>
+<section class="panel form-panel">
+{% if submission %}<h2>{{ submission.need }}</h2><p>Submitted by {{ submission.submitted_by }} · {{ submission.submitted_at|date:'M j, Y H:i' }}</p><p>{{ submission.need.description }}</p><a href="{% url 'need-detail' submission.need_id %}" class="action-link">{% include "community_resilience/icon.html" with name="eye" only %}<span>View community need</span></a><a href="{% url 'need-completion-proof' submission.pk %}" target="_blank" rel="noopener"><img class="admin-proof" src="{% url 'need-completion-proof' submission.pk %}" alt="Completion evidence submitted by {{ submission.submitted_by }}"></a><p>Status: {{ submission.get_review_status_display }}</p>{% endif %}
+<form method="post">{% csrf_token %}{% if form.non_field_errors %}<div class="form-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+{% for field in form %}<div class="field {% if field.field.widget.input_type == 'checkbox' %}admin-checkbox{% endif %}"><label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} *{% endif %}</label>{{ field }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}{% for error in field.errors %}<span class="error" role="alert">{{ error }}</span>{% endfor %}</div>{% endfor %}
+<div class="form-actions"><button class="button" type="submit">{% include "community_resilience/icon.html" with name="save" only %}<span>{% if submission %}Save review{% else %}Save account{% endif %}</span></button><a class="button secondary" href="{{ cancel_url }}">{% include "community_resilience/icon.html" with name="close" only %}<span>Cancel</span></a></div></form>
+</section>{% endblock %}
